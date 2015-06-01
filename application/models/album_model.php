@@ -61,20 +61,14 @@
 
 		public function add_album_and_artist($new_album) 
 		{
-			$this->db->query("INSERT INTO albums (title, artist, created_at, updated_at) VALUES (?, ?, NOW(), NOW())", array($new_album['title'], $new_album['artist2']));
-
-			return $this->db->query("INSERT INTO reviews (user_id, album_id, review, rating, created_at, updated_at) VALUES (?, last_insert_id(), ?, ?, NOW(), NOW())", array($new_album['user_id'], $new_album['review'], $new_album['rating']));
-		}
-		public function add_album($new_album) 
-		{
-			$this->db->query("INSERT INTO albums (title, artist, created_at, updated_at) VALUES (?, ?, NOW(), NOW())", array($new_album['title'], $new_album['artist']));
+			$this->db->query("INSERT INTO albums (title, artist, created_at, updated_at) VALUES (?, ?, NOW(), NOW())", array($new_album['title'], $new_album['artist1']));
 
 			return $this->db->query("INSERT INTO reviews (user_id, album_id, review, rating, created_at, updated_at) VALUES (?, last_insert_id(), ?, ?, NOW(), NOW())", array($new_album['user_id'], $new_album['review'], $new_album['rating']));
 		}
 
 		public function get_album_id($new_album)
 		{
-			return $this->db->query("SELECT albums.id FROM albums WHERE title = ? AND artist = ?", array($new_album['title'], $new_album['artist']))->row_array();
+			return $this->db->query("SELECT albums.id FROM albums WHERE title = ? AND artist = ?", array($new_album['title'], $new_album['artist1']))->row_array();
 		}
 
 		public function get_user_reviewed($new_album)
@@ -82,12 +76,17 @@
 			return $this->db->query("SELECT id FROM reviews WHERE user_id = ? AND album_id = ?", array($new_album['user_id'], $new_album['album_id']))->row_array();
 		}
 
+		public function update_existing_review($new_album)
+		{
+			return $this->db->query("UPDATE reviews SET review = ?, rating = ?, created_at = NOW() WHERE id = ?", array($new_album['review'], $new_album['rating'], $new_album['user_review_id']));
+		}
+
 		public function get_album_info($id)
 		{
 			return $this->db->query("SELECT * FROM albums WHERE id = ?", $id) ->row_array();
 		}
 
-		public function add_review($new_album)
+		public function add_review_existing_album($new_album)
 		{
 			return $this->db->query("INSERT INTO reviews (user_id, album_id, review, rating, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW());", array($new_album['user_id'], $new_album['album_id'], $new_album['review'], $new_album['rating']));
 		}

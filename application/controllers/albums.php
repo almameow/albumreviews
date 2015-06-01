@@ -26,6 +26,7 @@ class Albums extends CI_Controller {
 	public function get_all_reviews()
 	{
 		$all_reviews['reviews'] = $this->Album_model->get_all_reviews();
+		
 		// Load partial
 		$this->load->view("partials/all_reviews", $all_reviews);
 	}
@@ -34,82 +35,86 @@ class Albums extends CI_Controller {
 	{
 		$new_album = $this->input->post();
 		$new_album['user_id'] = $this->session->userdata("current_user");
-		//var_dump($new_album);
-
-		////// if existing artist, do same function as adding new artist (save over any existing reviews by same user)
-
-
-		// If all fields (except artist/artist2) entered (rating automatically set to 1)
-		if(!empty($new_album['title']) || !empty($new_album['review'] )) 
+		
+		// If all fields are entered (rating automatically set to 1)
+		if(!empty($new_album['title']) && !empty($new_album['review'])) 
 		{
-			// If only one of the artist fields is entered 
-			if(!(empty($new_album['artist']) && empty($new_album['artist2'])) || (!empty($new_album['artist']) && empty($new_album['artist2'])))
+			// If user selected AND entered an artist
+			if(!empty($new_album['artist1']) && !empty($new_album['artist']))
 			{
-				// If adding a new artist
-				if(!empty($new_album['artist2'])) 
+				$this->session->set_flashdata("add_error", "You can only enter one artist name.");
+		 		redirect("/albums/add");
+			}
+			// Only one artist entered
+			else
+			{
+				// If artist1 entered
+				if(!empty($new_album['artist1']))
 				{
+					$album_exists = $this->Album_model->get_album_id($new_album);
+
+					// If this album+artist exists in db
+					if($album_exists)
+					{
+						//save album's id to $new_album
+						$new_album['album_id'] = $album_exists['id'];
+						$user_has_reviewed = $this->Album_model->get_user_reviewed($new_album);
+
+						// If user has already reviewed this album
+						if($user_has_reviewed)
+						{
+							//update their existing review
+							$new_album['user_review_id'] = $user_has_reviewed['id'];
+							$this->Album_model->update_existing_review($new_album);
+
+							$title = $new_album['title'];
+							$artist = $new_album['artist1'];
+							$this->session->set_flashdata("add_success", "Your review for the album $title by $artist has been successfully updated.");
+							redirect("/albums/add");
+						}
+						// User hasn't yet reviewed this exisiting album/artist
+						else
+						{
+							//add their review
+							$this->Album_model->add_review_existing_album($new_album);
+
+							$title = $new_album['title'];
+							$artist = $new_album['artist1'];
+							$this->session->set_flashdata("add_success", "Your review for the album $title by $artist has been successfully added.");
+							redirect("/albums/add");
+						}
+					}
+					// Add new review for album+artist not in db
+					else
+					{
+						$this->Album_model->add_album_and_artist($new_album);
+
+						$title = $new_album['title'];
+						$artist = $new_album['artist1'];
+						$this->session->set_flashdata("add_success", "Your review for the album $title by $artist has been successfully added.");
+						redirect("/albums/add");
+					}
+				}
+				// Else artist entered
+				else
+				{
+					$new_album['artist1'] = $new_album['artist'];
+					//add review to db
 					$this->Album_model->add_album_and_artist($new_album);
-					$albums['album'] = $new_album;
 
 					$title = $new_album['title'];
-					$artist = $new_album['artist2'];
-					$this->session->set_flashdata("add_success", "Your review for the newly added album $title by $artist has been successfully added.");
+					$artist = $new_album['artist1'];
+					$this->session->set_flashdata("add_success", "Your review for the newly created album $title by $artist has been successfully added.");
 					redirect("/albums/add");
 				}
-				// Adding a review for an existing artist (on drop down list)
-				else 
-				{
-					$this->Album_model->add_album($new_album);
-					$albums['album'] = $new_album;
-
-					$title = $new_album['title'];
-					$artist = $new_album['artist'];
-					$this->session->set_flashdata("add_success", "Your review for the newly added album $title by $artist has been successfully added.");
-					redirect("/albums/add");
-
-					//$album_id = $this->Album_model->get_album_id($new_album); why am i calling this here?
-					// $this->Album_model->add_album_only($new_album);
-
-					// $title = $new_album['title'];
-					// $artist = $new_album['artist'];
-					// $new_album['album_id'] = $album_id['id'];
-
-					///check is user has already reviewed this album
-					//$user_has_reviewed = $this->Album_model->get_user_reviewed($new_album);
-
-					//if user has already reviewed this album
-					// if(!empty($user_has_reviewed)) 
-					// {
-					// 	$this->session->set_flashdata("add_error", "You have already reviewed this album.");
-					// 	redirect("/albums/add");
-					// }
-					// else //user has not yet reviewed this album
-					// {
-					// 	$this->Album_model->add_review($new_album);
-					// 	$albums['album'] = $new_album;
-
-					// 	$title = $new_album['title'];
-					// 	$artist = $new_album['artist'];
-					// 	$this->session->set_flashdata("add_success", "Your review for the album $title by $artist  has been successfully added.");
-					// 	redirect("/albums/add");
-					// }
-				}
-				
 			}
-			// Else both or neither artist field entered
-			else 
-			{
-				$this->session->set_flashdata("add_error", "You must enter only one artist name.");
-				redirect("/albums/add");
-			}
-		}
-		//Else not all fields entered
+		}	
+		// Else not all fields entered
 		else 
 		{
 			$this->session->set_flashdata("add_error", "All fields must be completed.");
 			redirect("/albums/add");
 		}
-
 	}
 
 	public function get_all_artists()
@@ -118,9 +123,13 @@ class Albums extends CI_Controller {
 		$this->load->view("partials/all_artists", $all_artists);
 	}
 
-	public function show_album($id) //Link from album title to full album description
+	//Link from album title to full album description
+	public function show_album($id)
 	{
 		$all_reviews['reviews'] = $this->Album_model->get_album_info($id);
+		$user_id['name'] = $this->session->userdata("current_user");
+		$all_reviews['user'] = $this->Album_model->get_user($user_id);
+
 		$this->session->set_userdata("current_album_id", $id);
 		$this->load->view("show_album", $all_reviews);
 	}
@@ -128,8 +137,46 @@ class Albums extends CI_Controller {
 	public function get_reviews_per_album()
 	{
 		$all_reviews['reviews'] = $this->Album_model->get_reviews_per_album($this->session->userdata("current_album_id"));
-		//var_dump($all_reviews);
 		$this->load->view("partials/all_reviews_per_album", $all_reviews);
+	}
+
+	public function add_review_to_album()
+	{
+		$new_review = $this->input->post();
+		$new_review['user_id'] = $this->session->userdata("current_user");
+		$new_review['album_id'] = $this->session->userdata("current_album_id");
+
+		$user_has_reviewed = $this->Album_model->get_user_reviewed($new_review);
+		//If user has already reviewed this album
+		if($user_has_reviewed)
+		{
+			// Update their review
+			$new_review['user_review_id'] = $user_has_reviewed['id'];
+			$this->Album_model->update_existing_review($new_review);
+
+			// Reload page with updated review
+			$id = $new_review['album_id'];
+			$all_reviews['reviews'] = $this->Album_model->get_album_info($id);
+			$user_id['name'] = $this->session->userdata("current_user");
+			$all_reviews['user'] = $this->Album_model->get_user($user_id);
+			$this->session->set_userdata("current_album_id", $id);
+			$this->load->view("show_album", $all_reviews);
+		}	
+		// User has not reviewed this album
+		else
+		{
+			//add user's review
+			$this->Album_model->add_review_existing_album($new_review);
+
+			// Reload page with new review
+			$id = $new_review['album_id'];
+			$all_reviews['reviews'] = $this->Album_model->get_album_info($id);
+			$user_id['name'] = $this->session->userdata("current_user");
+			$all_reviews['user'] = $this->Album_model->get_user($user_id);
+			$this->session->set_userdata("current_album_id", $id);
+			$this->load->view("show_album", $all_reviews);
+		}
+			
 	}
 
 

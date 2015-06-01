@@ -73,10 +73,10 @@
 				<div class="row">
 					<div class="form-group col-md-8">
 						<label for="artist">Album Artist:</label>
-						<h6><label for="artist1" >Select from the list: </label></h6>
-						<div id="all_artists"></div>
+						<h6><label for="artist" >Select from the list: </label></h6>
+						<div id="all_artists" name="artist"></div>
 						<h6><label for="artist2">Or add a new artist:</label></h6>
-						<input type="text" class="form-control" id="artist" name="artist2">
+						<input type="text" class="form-control" id="artist2" name="artist">
 					</div>
 				</div>
 				<div class="row">
@@ -102,7 +102,7 @@
 				</div>
 			</form>
 		</div>
-		
+
 	</div>
 <?php
 }

@@ -50,6 +50,11 @@ a:hover{
 	min-height: 250px;
 	padding: 10px;
 }
+.border_top:first-child{
+	border-top: none;
+	margin-top: 10px;
+	padding-top: 5px;
+}
 .border_top{
 	border-top: 1px dashed #000000;
 	margin-top: 10px;

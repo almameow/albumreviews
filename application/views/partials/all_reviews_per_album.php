@@ -3,7 +3,7 @@
 	{
 		$date = date_create($review['created_at']);
 ?>
-		<div class="row col-md-offset-1 border_top">
+		<div class="col-md-11 col-md-offset-1 border_top">
 			<p class="inline">Rating:</p>
 <?php
 			for($i=0; $i<$review['rating']; $i++)
@@ -22,3 +22,4 @@
 			// }
 	}
  ?>
+ 		</div>

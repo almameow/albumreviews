@@ -1,4 +1,4 @@
-<select class="form-control least_width" name="artist" id="artist artist1">
+<select class="form-control" name="artist1" id="artist">
 	<option value=""></option>
 <?php 
 	foreach($artists as $artist)
