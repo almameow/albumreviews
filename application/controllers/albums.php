@@ -137,6 +137,7 @@ class Albums extends CI_Controller {
 	public function get_reviews_per_album()
 	{
 		$all_reviews['reviews'] = $this->Album_model->get_reviews_per_album($this->session->userdata("current_album_id"));
+		//var_dump($all_reviews);
 		$this->load->view("partials/all_reviews_per_album", $all_reviews);
 	}
 
@@ -177,6 +178,22 @@ class Albums extends CI_Controller {
 			$this->load->view("show_album", $all_reviews);
 		}
 			
+	}
+
+	public function delete_review($id)
+	{
+		// Save selected album id and current user's id to $review to delete from db
+		$review['album_id'] = $id;
+		$review['user_id'] = $this->session->userdata("current_user");
+		$this->Album_model->delete_review($review);
+
+		// Reload page
+		$all_reviews['reviews'] = $this->Album_model->get_album_info($id);
+		$user_id['name'] = $this->session->userdata("current_user");
+		$all_reviews['user'] = $this->Album_model->get_user($user_id);
+		$this->session->set_userdata("current_album_id", $id);
+		$this->load->view("show_album", $all_reviews);
+
 	}
 
 

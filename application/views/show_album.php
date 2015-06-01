@@ -1,12 +1,11 @@
 <html>
 <head>
 	<title>Albums Home</title>
-	<!-- Call Twitter bootstrap -->
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 	<script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-	
 	<link rel="stylesheet" href="/../assets/style.css">
+	<link rel="shortcut icon" href="/../assets/favicon.ico" type="image/x-icon" />
 	<script>
 		$(document).ready(function(){
 			// 
@@ -37,7 +36,7 @@
 					<li><a href="/index/go_home">Return to <?= $user['name'] ?>'s Dashboard</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
-					<li><p class="navbar-text">Add Album and Review</p></li>
+					<li><a href="/albums/add">Add Album and Review</a></li>
 					<li><a href="/index/logout">Logout</a></li>
 				</ul>
 			</div>

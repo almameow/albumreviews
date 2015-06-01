@@ -12,7 +12,6 @@
 		{
 			echo "<span class='glyphicon glyphicon-star-empty text-purple' aria-hidden='true'></span>";
 		}			
-		echo "<p><a href='#'>" . $review['username'] . "</a> says: " . $review['review'] . "</p></div>";
+		echo "<p><a href='/index/users/" . $review['user_id'] . "'>" . $review['username'] . "</a> says: " . $review['review'] . "</p></div>";
 	}
 ?>
-

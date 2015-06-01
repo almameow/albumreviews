@@ -14,12 +14,14 @@
 			{
 				echo "<span class='glyphicon glyphicon-star-empty text-purple' aria-hidden='true'></span>";
 			}			
-			echo "<p><a href='#'>" . $review['username'] . "</a> says: " . $review['review'] . "</p>";
-			echo "<p><i>Posted on " . date_format($date, "F j, Y") . "</i></p></div>";
-			// if($review['user_id'] == $this->session->username("current_user"))
-			// {
-			// 	echo "<a class='col-md-offset-9' href='#'>Delete this review</a>";
-			// }
+			echo "<p><a href='/index/users/" . $review['user_id'] . "'>" . $review['username'] . "</a> says: " . $review['review'] . "</p>";
+			echo "<p class='inline'><i>Posted on " . date_format($date, "F j, Y") . "</i></p>";
+			if($review['user_id'] == $this->session->userdata("current_user"))
+			{
+				echo "<p class='inline col-md-offset-6'><a href='/albums/delete_review/" . $this->session->userdata("current_album_id") . "'>Delete this review</a></p>";
+			}
+?>
+		</div>
+<?php
 	}
  ?>
- 		</div>

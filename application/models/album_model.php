@@ -28,7 +28,7 @@
 			return $this->db->query("SELECT * FROM users WHERE email = ? AND password = ?", array($login_info['email'], $login_info['pass'])) -> row_array();
 		}
 
-		// HOME PAGE //
+		// DASHBOARD //
 		public function get_recent_reviews()
 		{
 			return $this->db->query("SELECT albums.title, albums.artist, albums.id as album_id, 
@@ -53,7 +53,7 @@
 				GROUP BY albums.title;")->result_array();
 		}
 
-		// ADD ALBUM AND REVIEW PAGE // 
+		// ADD REVIEW PAGE //
 		public function get_all_artists()
 		{
 			return $this->db->query("SELECT artist FROM albums GROUP BY artist") -> result_array();
@@ -91,13 +91,28 @@
 			return $this->db->query("INSERT INTO reviews (user_id, album_id, review, rating, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW());", array($new_album['user_id'], $new_album['album_id'], $new_album['review'], $new_album['rating']));
 		}
 
-		// SHOW ALBUM PAGES //
+		// ALBUM DETAILS PAGES //
 		public function get_reviews_per_album($id)
 		{
 			return $this->db->query("SELECT reviews.review, reviews.rating, reviews.created_at, users.username, users.id as user_id, albums.title, albums.artist FROM reviews
 				LEFT JOIN albums ON reviews.album_id = albums.id
 				LEFT JOIN users ON reviews.user_id = users.id
 				WHERE albums.id = ?
+				ORDER BY reviews.created_at DESC", $id) ->result_array();
+		}
+
+		public function delete_review($review)
+		{
+			return $this->db->query("DELETE FROM reviews WHERE reviews.album_id = ? AND reviews.user_id = ?", array($review['album_id'], $review['user_id']));
+		}
+
+		// USER DETAILS PAGES //
+		public function get_reviews_per_user($id)
+		{
+			return $this->db->query("SELECT albums.id, albums.title, albums.artist FROM reviews
+				LEFT JOIN albums ON reviews.album_id = albums.id
+				LEFT JOIN users ON reviews.user_id = users.id
+				WHERE users.id = ?
 				ORDER BY reviews.created_at DESC", $id) ->result_array();
 		}
 	}

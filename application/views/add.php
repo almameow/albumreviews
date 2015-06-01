@@ -1,12 +1,11 @@
 <html>
 <head>
 	<title>Albums Home</title>
-	<!-- Call Twitter bootstrap -->
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 	<script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-	
 	<link rel="stylesheet" href="/../assets/style.css">
+	<link rel="shortcut icon" href="/../assets/favicon.ico" type="image/x-icon" />
 
 	<script>
 		$(document).ready(function(){

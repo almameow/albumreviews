@@ -72,18 +72,24 @@ class Index extends CI_Controller {
 		$reg_info = $this->input->post();
 		$username = $reg_info['username'];
 		$existing_user = $this->Album_model->get_usernames($username);
-		//var_dump($reg_info);
-		if(!empty($reg_info['name']) || !empty($reg_info['username']) || !empty($reg_info['email']) || !empty($reg_info['pass']) || !empty($reg_info['confirm_pass'])) //if no field is empty
+
+		//if no field is empty
+		if(!empty($reg_info['name']) && !empty($reg_info['username']) && !empty($reg_info['email']) && !empty($reg_info['pass']) && !empty($reg_info['confirm_pass'])) 
 		{
-			if(empty($existing_user)) //if username does not exist
+			//if username does not exist
+			if(empty($existing_user)) 
 			{
-				if(filter_var($reg_info['email'], FILTER_VALIDATE_EMAIL)) //if email is valid
+				//if email is valid
+				if(filter_var($reg_info['email'], FILTER_VALIDATE_EMAIL)) 
 				{
-					if(!empty($reg_info['pass']) && !empty($reg_info['confirm_pass'])) //if no passwords are empty
+					//if no passwords are empty
+					if(!empty($reg_info['pass']) && !empty($reg_info['confirm_pass'])) 
 					{
-						if(strlen($reg_info['pass']) > 7) //if password is at least 8 char long
+						//if password is at least 8 char long
+						if(strlen($reg_info['pass']) > 7) 
 						{
-							if($reg_info['pass'] == $reg_info['confirm_pass']) //if passwords match
+							//if passwords match
+							if($reg_info['pass'] == $reg_info['confirm_pass']) 
 							{
 								// Add new user to db
 								$this->Album_model->add_new_user($reg_info);
@@ -126,11 +132,19 @@ class Index extends CI_Controller {
 			redirect("/");
 		}
 	}
+
+	public function users($id)
+	{
+		$current_user_id = $this->session->userdata("current_user");
+		$users['current_user'] = $this->Album_model->get_user($current_user_id);
+		$users['user'] = $this->Album_model->get_user($id);
+		$users['reviews'] = $this->Album_model->get_reviews_per_user($id);
+		$this->load->view("users", $users);
+	}
+
 	public function logout()
 	{
 		$this->session->set_userdata("logged_in", FALSE);
 		redirect("/");
 	}
 }
-
-//end of main controller
